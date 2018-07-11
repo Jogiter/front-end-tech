@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>translate && clock demo</title>
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <style type="text/css">
+    * {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+    a[href] {
+        text-decoration: none;
+    }
+
+    a[href]:hover {
+        text-decoration: underline;
+    }
+
+    canvas#clock {
+        width: 150px;
+        height: 150px;
+    }
+    </style>
+</head>
+
+<body>
+    <h2><a href="//developer.mozilla.org/zh-CN/docs/Web/API/Canvas_API/Tutorial/Transformations" target="_blank">canvas translate & roate demo</a></h2>
+    <small>可以通过css来改变时钟的大小</small>
+    <hr>
+    <canvas id="clock" width="300" height="300">your browser do not support canvas</canvas>
+    <hr>
+    <p>Relative links</p>
+    <ol>
+        <li>
+            <a href="//codereview.stackexchange.com/questions/61825/can-the-performance-of-this-canvas-drawimage-test-be-improved" target="_blank">canvas-drawimage-optimization</a>
+        </li>
+        <li>
+            <a href="//developer.mozilla.org/zh-CN/docs/Web/API/Canvas_API/Tutorial/Transformations" target="_blank">Canvas_API/Tutorial/Transformations</a>
+        </li>
+        <li>
+            <a href="//developer.mozilla.org/zh-CN/docs/Web/API/CanvasRenderingContext2D/createRadialGradient" target="_blank">CanvasRenderingContext2D APIs</a>
+        </li>
+    </ol>
+    <script src="clock.js"></script>
+    <script type="text/javascript">
+    new CanvasClock({
+        el: '#clock'
+    }).init();
+    </script>
+</body>
+
+</html>

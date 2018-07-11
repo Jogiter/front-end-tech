@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>tieba canvas</title>
+    <link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/3.0.3/normalize.css">
+    <style type="text/css">
+    #demo {
+        border: 1px dashed red;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        cursor: point !important;
+    }
+
+    .control {
+        margin: 10px 0;
+        padding: 10px;
+        background-color: #444;
+    }
+
+    button[disabled] {
+        background-color: #ccc;
+    }
+
+    .txt {
+        position: absolute;
+        min-width: 200px;
+        padding: 0;
+        margin: 0;
+        border: 1px solid green;
+        min-height: 20px;
+        background-color: #fff;
+    }
+    </style>
+</head>
+
+<body>
+    <canvas id="demo" width="300" height="300">browser do not support html5 canvas</canvas>
+    <div class="control">
+        <button id="cvs-clean">clean</button>
+        <button id="cvs-eraser" disabled>eraser</button>
+        <button id="cvs-img" disabled>img</button>
+        <button id="cvs-txt" disabled>txt</button>
+        <button id="cvs-save">save</button>
+    </div>
+    <script type="text/javascript" src="./index.js"></script>
+    <script type="text/javascript">
+    var test = new canvas({
+        selector: '#demo'
+    });
+    </script>
+</body>
+
+</html>

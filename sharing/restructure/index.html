@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>金融超市移动端重构</title>
+  <link rel="stylesheet" href="https://cdn.bootcss.com/reveal.js/3.6.0/css/reveal.min.css">
+  <link rel="stylesheet" href="https://cdn.bootcss.com/reveal.js/3.6.0/css/theme/black.min.css">
+  <link rel="stylesheet" href="https://cdn.bootcss.com/reveal.js/3.6.0/lib/css/zenburn.min.css">
+  <!-- <link rel="stylesheet" href="https://cdn.bootcss.com/reveal.js/3.6.0/css/print/paper.min.css"> -->
+  <style>
+    .small {
+      font-size: 24px !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+      <section data-markdown>
+        ### 金融超市移动端重构
+
+        *  讲师：丁周裕
+        *  部门：商业产品中心-会员商品中心-1 组
+      </section>
+      <section >
+        <section data-markdown>
+          #### 项目介绍
+
+          + 项目使用 `seajs` 模块化开发
+          + 配合了 [seajs-wrap](https://github.com/seajs/seajs-wrap) ，遵循 `CommonJS` 开发即可
+          + 使用 `webpack` 打包了 js
+        </section>
+        <section data-markdown>
+          **目录结构**
+
+          ```
+          + wap
+            + act 活动目录
+              - benefit 具体活动名，访问时 //jinrong.xunlei.com/wap/act/benefit/
+                - css/    重构提供的静态资源
+                - images/ 重构提供的静态资源
+                - img/    重构提供的静态资源
+                - js/     重构提供的静态资源
+                - index.html 活动页面
+              - ...
+            + dist 第三方库和插件、以及打包后的js和
+              - wap/1.0.0/source/*.js 打包后各个页面的js文件
+              - underscore/
+              - zepto/
+              - plugins/swiper 插件目录
+            + node_modules
+            + source
+              - common/
+              - tools/
+              - plugins/
+              - *.js 后各个页面的js原文件
+            + ssi 存放ssi文件
+            + tpl tools引用的模板
+            + vip
+              - css/    重构提供的静态资源
+              - images/ 重构提供的静态资源
+              - img/    重构提供的静态资源
+              - js/     重构提供的静态资源
+              - *.html  项目页面
+            + weixin_huiyuan 绑定微信会员页(功能独立，暂不急处理)
+              - js/
+              - index.html
+          + waplogin 登录页面
+            - js/
+            - login.html
+          + webpack.config.js
+          + package.json
+          + .eslintrc.js
+          + .eslintignore
+          + README.md
+          + .gitignore
+          ```
+        </section>
+        <section data-markdown class="small">
+            **优点**
+
+            * 模块化开发，使用了`seajs`进行加载模块
+            * 通过在链接上配置`?dev`可以访问未打包的源码进行调试
+            * 使用了服务器的`ssi`功能复用部分 html 
+        </section>
+        <section data-markdown class="small">
+            **缺点**
+            
+            * 开发是通过 ftp 上传到内网服务器的
+            * 拷贝重构文件到本地、同时上传到服务器。操作麻烦，开发效率低。
+            * 多个人开发同一个页面不同功能时，会互相影响。
+            * 升级 `https` 后在同一目录下开发测试，会互相影响。
+            * 使用了 `ssi` 功能，前后端混合开发，前端无法进行压缩等优化
+            * 仅仅打包压缩了 `js` 文件，`html` 文件未压缩，优化不到位
+            * 无法使用 `eslint`、`prettier`、`es6` 等新技术
+            * 后续升级麻烦，比如用 `vue` 重构等等
+        </section>
+      </section>
+      <section data-markdown class="small">
+        ####  重构目标
+
+        - [x] 尽量减少改动，不影响现有业务
+        - [x] 不在使用 seajs
+        - [x] 本地开发。支持 HMR
+        - [x] 增加 eslint 支持
+        - [x] 移除 ssi(使用 [ssi-loader](https://github.com/Jogiter/ssi-loader))。部分不方便移除的保留，不影响现在业务，轻量化升级操作
+        - [x] 压缩所有静态资源，缩短资源加载时间
+        - [ ] 重构 css 等资源过大，需移除未使用的代码
+        - [x] 分离项目页面和活动页面打包，加快打包速度
+        - [ ] 代码重构。使用 web 组 sdk 进行优化，减少页面引用
+        - [x] 配置 [babel-loader](https://github.com/babel/babel-loader) 支持 es6
+        - [ ] 配置 [prettier](https://github.com/prettier/prettier) 格式化代码
+        - [ ] 本地访问时路径是 http:// ，因为本地 443 端口需要管理员权限。
+        - [ ] 项目中引入 underscore，只用到了 _.template 函数。考虑使用 lodash 替换
+      </section>
+      <section data-markdown>
+        ###   重构
+      </section>
+      <section data-markdown>
+        ####  结构分析
+
+        1.  只需要保留 `vip/`, `act/**/`, `weixin_huiyuan` 目录，其他的可以迁移
+        2.  ~~需要在 `wap/vip/` 目录下新增 `login` 页面，原登录页重定向到新的页面~~
+        3.  为了便于配合重构开发及减少页面改动，涉及 `css`,`images`,`img` 等目录保持和 html 文件的相对位置不变
+      </section>
+      <section data-markdown>
+        ####  源文件迁移
+
+        1. 新建 `static` 目录
+        2. 将原来的 `vip/`, `act/**/` 目录拷贝到 `static`目录下。同级且结构不变。
+        3. 全局搜索替换 `ssi` 文件路径，移除 `seajs` 相关代码
+      </section>
+      <section data-markdown class="small">
+        ### 配置环境
+
+        1. 利用 `html-webpack-plugin`,`copy-webpack-plugin`生成拷贝文件
+        2. webpack 配置中的 devServer 需要将 host 设置为项目域名，比如金融超市`host: jinrong.xunlei.com`。同时需要在 host 文件中添加 `127.0.0.1 jinrong.xunlei.com`
+        3. `.html` 文件需要使用 `html-loader` 和 `ssi-loader` 搭配
+        4. html 文件压缩配置：`html-loader` 和 `html-webpack-plugin` 配置压缩时，需要保留引号(base64)和注释(未替换的 ssi)
+        5. `package.json` 中配置 2 个打包命名，将项目页面和活动页面打包分开
+        6. `es6` 处理，`webpack.config.js` 添加 `loader`；添加 `.babelrc`；`.eslintrc` 中修改 `parser: 'babel-eslint'`
+      </section>
+      <section data-markdown class="small">
+        ####  开发流程
+
+        1.  拷贝重构文件。活动拷贝到 `wap/static/act/活动名/` 目录下；项目页面拷贝到 `wap/static/` 目录下
+        2.  在 `wap/source/` 目录下新建一份 js 文件，建议和活动名同名
+        3.  去 `build/` 目录下的 `config.js` 或 `config.act.js` 中的 `mapping` 中新增配置
+        4.  切换本地开发 host
+        5.  项目页面执行 `yarn run dev`；活动页面执行 `yarn run dev:act`。
+        6.  coding~~
+        7.  打包：项目页面执行 `yarn run build`；活动页面执行 `yarn run build:act`
+        8.  提交分支，提测。
+        9.  bugfix：重复 4-8 步骤
+        10. 上线
+      </section>
+      <section data-markdown>
+        ####   阅读链接
+
+        * [html-webpack-plugin](https://github.com/jantimon/html-webpack-plugin)
+        * [copy-webpack-plugin](https://github.com/webpack-contrib/copy-webpack-plugin)
+        * [ssi-loader](https://github.com/Jogiter/ssi-loader)
+        * [webpack-devserver https 配置](https://webpack.docschina.org/configuration/dev-server/)
+        * [babel-loader](https://github.com/babel/babel-loader/tree/v7.1.4)
+        * [babel-eslint](https://github.com/babel/babel-eslint)
+        * [babel](https://github.com/babel/babel/tree/v6.26.3)
+        * [HTTPS证书生成原理和部署细节](https://www.barretlee.com/blog/2015/10/05/how-to-build-a-https-server/)
+        * [如何在 webpack 中引入未模块化的库，如 Zepto](https://sebastianblade.com/how-to-import-unmodular-library-like-zepto/)
+      </section>
+      <section data-markdown>
+        THANKS
+      </section>
+    </div>
+  </div>
+
+  <script src="https://cdn.bootcss.com/reveal.js/3.6.0/js/reveal.min.js"></script>
+  <script src="https://cdn.bootcss.com/reveal.js/3.6.0/plugin/highlight/highlight.min.js"></script>
+  <script src="https://cdn.bootcss.com/reveal.js/3.6.0/plugin/markdown/marked.js"></script>
+  <script src="https://cdn.bootcss.com/reveal.js/3.6.0/plugin/markdown/markdown.min.js"></script>
+  <script src="https://cdn.bootcss.com/reveal.js/3.6.0/plugin/zoom-js/zoom.min.js"></script>
+  <script>
+    Reveal.initialize()
+  </script>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <title>canvas learn</title>
+    <style type="text/css">
+    #mycan {
+        border: 1px solid #d3d3d3;
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+    .img-demo {
+        width: 33.75rem;
+        height: 16.125rem;
+    }
+    </style>
+</head>
+
+<body>
+    <canvas id="mycan" width="600" height="800">
+        浏览器不支持canvas标签，请使用最新的chrome或者opera
+    </canvas>
+    <img src="https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png" alt="baidu logo" class="img-demo">
+    <hr>
+    <a href="https://jsfiddle.net/c5m8g4x9/" target="_blank">gradient demo</a>
+    <ol>
+        <li><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/Canvas_API/Tutorial/Transformations">Canvas_API/Tutorial</a></li>
+        <li><a href="https://developer.mozilla.org/zh-CN/docs/Web/API/CanvasRenderingContext2D/arc">CanvasRenderingContext2D</a></li>
+        <li>
+            <a href=""></a>
+        </li>
+        <li>
+            <a href=""></a>
+        </li>
+    </ol>
+    <script type="text/javascript">
+    var doc = document,
+        body = doc.body;
+
+    var $ = function(el) {
+        return doc.querySelector(el);
+    };
+    var $$ = function(el) {
+        return doc.querySelectorAll(el);
+    };
+    var create = function(el) {
+        return doc.createElement(el);
+    };
+
+    var cvs = $('#mycan');
+    if (cvs.getContext) {
+        var ctx = cvs.getContext('2d'),
+            cw = cvs.getAttribute('width'),
+            ch = cvs.getAttribute('height');
+        ctx.clearRect(0, 0, cw, ch);
+
+        var padding = 20;
+
+        // 渐变背景
+        ctx.beginPath();
+        var gradient = ctx.createLinearGradient(0, 200, 200, 0);
+        gradient.addColorStop(0, "red");
+        gradient.addColorStop(1, "yellow");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(padding, padding, 300 - padding * 2, 300 - padding * 2);
+        ctx.save();
+
+        // 清除一个空白矩形
+        ctx.clearRect(100, 100, 100, 100);
+
+        // 画脸
+        ctx.beginPath();
+        ctx.strokeStyle = '#952BE3';
+        ctx.lineWidth = 2;
+        ctx.arc(150, 150, 50, 0, Math.PI * 2, false);
+        ctx.moveTo(185, 150);
+        ctx.arc(150, 150, 35, 0, Math.PI, false);
+        ctx.moveTo(138, 130);
+        ctx.arc(130, 130, 8, 0, Math.PI * 2, true); // 口(顺时针)
+        ctx.moveTo(178, 130);
+        ctx.arc(170, 130, 8, 0, Math.PI * 2, true); // 口(顺时针)
+        ctx.stroke();
+        ctx.save();
+
+        // 绘制三角形，填充颜色
+        ctx.beginPath();
+        ctx.fillStyle = '#FF0000';
+        ctx.moveTo(145, 150);
+        ctx.lineTo(155, 150);
+        ctx.lineTo(150, 160);
+        ctx.lineTo(145, 150);
+        ctx.fill();
+        ctx.save();
+
+        // 渐变的圆
+        ctx.beginPath(); //  当你想创建一个新的路径时，调用此方法
+        ctx.lineWidth = 6;
+        var gradient = ctx.createLinearGradient(0, 0, 200, 0);
+        gradient.addColorStop(0, "green");
+        gradient.addColorStop(1, "white");
+        ctx.strokeStyle = gradient;
+        ctx.arc(150, 150, 75, 0, Math.PI * 2, true);
+        ctx.stroke();
+        ctx.save();
+
+        // 画圆
+        ctx.beginPath();
+        ctx.restore();
+        ctx.restore();
+        ctx.arc(150, 150, 79, 0, Math.PI * 2, true);
+        ctx.stroke();
+        ctx.save();
+
+        // 贝塞尔（bezier）
+        ctx.beginPath();
+        ctx.restore();
+        ctx.moveTo(300, 30);
+        ctx.quadraticCurveTo(400, 50, 300, 70);
+        ctx.stroke();
+
+        // 贝塞尔心形
+        ctx.beginPath();
+        ctx.moveTo(75, 40);
+        ctx.bezierCurveTo(75, 37, 70, 25, 50, 25);
+        ctx.bezierCurveTo(20, 25, 20, 62.5, 20, 62.5);
+        ctx.bezierCurveTo(20, 80, 40, 102, 75, 120);
+        ctx.bezierCurveTo(110, 102, 130, 80, 130, 62.5);
+        ctx.bezierCurveTo(130, 62.5, 130, 25, 100, 25);
+        ctx.bezierCurveTo(85, 25, 75, 37, 75, 40);
+        ctx.fill();
+
+        // fillStyle
+        for (var i = 0, length = 6; i <= length; i++) {
+            var basePixel = (255 / length);
+            for (var j = 0; j <= length; j++) {
+                ctx.beginPath();
+                ctx.fillStyle = 'rgb(' + Math.floor(basePixel * i) + ',' + Math.floor(basePixel * j) + ',0)';
+                ctx.fillRect(400 + 25 * i, 25 * j, 25, 25);
+            }
+        }
+
+        // strokeStyle
+        for (var i = 0, length = 6; i <= length; i++) {
+            var basePixel = (255 / length);
+            for (var j = 0; j <= length; j++) {
+                ctx.beginPath();
+                ctx.moveTo(300 + 25 * i + 10, 140 + 25 * j);
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = 'rgb(' + Math.floor(basePixel * i) + ',' + Math.floor(basePixel * j) + ',0)';
+                ctx.arc(300 + 25 * i, 140 + 25 * j, 10, 0, Math.PI * 2, false);
+                ctx.stroke();
+            }
+        }
+
+        // globalAlpha
+        ctx.fillStyle = '#FD0';
+        ctx.fillRect(500, 200, 50, 50);
+        ctx.fillStyle = '#6C0';
+        ctx.fillRect(550, 200, 50, 50);
+        ctx.fillStyle = '#09F';
+        ctx.fillRect(500, 250, 50, 50);
+        ctx.fillStyle = '#F30';
+        ctx.fillRect(550, 250, 50, 50);
+        ctx.fillStyle = '#FFF';
+        for (var i = 0, length = 7; i < length; i++) {
+            ctx.beginPath();
+            ctx.moveTo(550 + i * 7, 250);
+            // 设置透明度值
+            // ctx.globalAlpha = 0.2;
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.arc(550, 250, i * 7, 0, Math.PI * 2, false);
+            ctx.fill();
+        }
+        ctx.save();
+
+        // 文字[理解ctx.save()&&ctx.restore()的作用]
+        ctx.beginPath();
+        ctx.shadowOffsetX = 4;
+        ctx.shadowOffsetY = 5;
+        ctx.shadowBlur = 2;
+        ctx.shadowColor = '#47B29E';
+        ctx.font = '36px sarif';
+        ctx.fillStyle = '#8C3FE1';
+        ctx.fillText('Hello World', 10, 330);
+        ctx.strokeStyle = '#E10601';
+        ctx.shadowColor = '#fff';
+        ctx.lineWidth = 1;
+        ctx.strokeText("Hello world", 10, 370);
+        ctx.restore();
+
+        // Canvas 填充规则
+        ctx.beginPath();
+        ctx.fillStyle = '#6C0';
+        ctx.moveTo(100, 450);
+        ctx.arc(50, 450, 50, Math.PI * 2, false);
+        ctx.moveTo(70, 450);
+        ctx.arc(50, 450, 20, Math.PI * 2, false);
+        ctx.fill('evenodd');
+        ctx.save();
+
+        // TODO:利用save()&&restore()方法来重置画笔
+        ctx.beginPath();
+        ctx.font = '14px "微软雅黑"';
+        ctx.textAlign = 'middle';
+        ctx.textBaseline = 'middle';
+        ctx.strokeStyle = 'red';
+        ctx.lineWidth = 1;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+        ctx.shadowBlur = 0;
+        ctx.strokeText('evenodd', 20, 450);
+        ctx.moveTo(20, 460);
+        ctx.lineTo(80, 460);
+        ctx.stroke();
+        ctx.save();
+
+        // drawImg
+        var img = new Image();
+        img.src = 'https://ss0.bdstatic.com/5aV1bjqh_Q23odCf/static/superman/img/logo/bd_logo1_31bdc765.png';
+        img.onload = function() {
+            ctx.save();
+            // 画图需要在图片加载完成后才可以绘制到canvas上
+            ctx.globalAlpha = 0.8;
+            ctx.drawImage(img, 335, 150, 150, 75, 230, 310, 100, 50);
+            ctx.restore();
+            // ctx.drawImage(img, 0, 0); // x 和 y 是其在目标 canvas 里的起始坐标。
+        };
+
+        // translate
+        ctx.beginPath();
+        ctx.translate(400, 400);
+        ctx.fillRect(0, 0, 50, 50);
+        ctx.restore(); // 移位后，图片会在canvas画完后再加载到画布上，因此移位后需要先恢复才可以继续绘画
+
+        // rotate
+        // ctx.save();
+        ctx.beginPath();
+        ctx.rotate(Math.PI / 4);
+        ctx.fillStyle = 'blue';
+        ctx.fillRect(400, 150, 40, 40);
+        ctx.restore();
+
+        // 万花筒
+        function drawSpirograph(ctx, R, r, O) {
+            var x1 = R - O;
+            var y1 = 0;
+            var i = 1;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            do {
+                if (i > 20000) break;
+                var x2 = (R + r) * Math.cos(i * Math.PI / 72) - (r + O) * Math.cos(((R + r) / r) * (i * Math.PI / 72))
+                var y2 = (R + r) * Math.sin(i * Math.PI / 72) - (r + O) * Math.sin(((R + r) / r) * (i * Math.PI / 72))
+                ctx.lineTo(x2, y2);
+                x1 = x2;
+                y1 = y2;
+                i++;
+            } while (x2  != R - O && y2  != 0);
+            ctx.stroke();
+        }
+
+        // translate
+        ctx.fillStyle = '#000';
+        ctx.save();
+        ctx.fillRect(0, 500, 300, 300);
+        for (var i = 0; i < 3; i++) {
+            for (var j = 0; j < 3; j++) {
+                ctx.save();
+                ctx.strokeStyle = "#9CFF00";
+                ctx.translate(50 + j * 100, 550 + i * 100);
+                drawSpirograph(ctx, 20 * (j + 2) / (j + 1), -8 * (i + 3) / (i + 1), 10);
+                ctx.restore();
+            }
+        }
+
+        // rotate
+        ctx.moveTo(320, 500);
+        ctx.font = '24px times';
+        var lineGradient = ctx.createLinearGradient(320, 500, 510, 530);
+        lineGradient.addColorStop(0, '#00A4D9');
+        lineGradient.addColorStop(1, '#9CFF00');
+        ctx.fillStyle = lineGradient;
+        ctx.scale(1.11, 1);
+        ctx.fillText('中华文化博大精深', 320, 500);
+
+
+    } else {
+        console.error('Browser do not support Canvas Element');
+    }
+    </script>
+</body>
+
+</html>
